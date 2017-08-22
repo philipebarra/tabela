@@ -1,0 +1,8 @@
+.selected, .selected:hover {
+    color: white;
+    background: #08c!important;
+}
+
+/* .pagination {
+    margin-top: -15px;
+} */
