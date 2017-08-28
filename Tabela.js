@@ -40,11 +40,6 @@ class Tabela
             if(!this._tbody)
                 this.setData();
         }
-
-        if(this._paginate) {
-            this.showPagination();
-        }
-
     }
 
     //ajax que modifica os valores da tabela
@@ -143,6 +138,10 @@ class Tabela
             }
             body.innerHTML = lines;
         }
+
+        if(this._paginate) {
+            this.showPagination(e);
+        }
     }
 
     //cria a string html de uma única linha com os dados passados como argumento {nome_coluna:valor}
@@ -155,7 +154,7 @@ class Tabela
         return `<tr>${columns}</tr>`;
     }
 
-    showPagination()
+    showPagination(e)
     {
        /*
         * verificar se página atual é 1 (desabilitar anterior)
@@ -312,7 +311,6 @@ class Tabela
     }
 }
 
-
 class Pagination
 {
     constructor(page, total, length)
@@ -320,8 +318,7 @@ class Pagination
         this._page = parseInt(page);
         this._total = parseInt(total);
         this._length = parseInt(length);
-        this._totalPages = Math.ceil(total/length);
-        
+        this._totalPages = Math.ceil(total/length);        
     }
 
     previous()
