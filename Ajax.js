@@ -1,6 +1,6 @@
 /**
  * Classe de ajax
- * versão 2017.7
+ * versão 2017.8
  * parametros aceitos:
  *
  * url: 'string'
@@ -48,10 +48,7 @@ class Ajax {
 
         if(typeof obj.processData === 'undefined')
             obj.processData = true;
-
-        if(typeof obj.token === 'undefined')
-            obj.token = true
-
+        
         obj.method = obj.method.toUpperCase();
 
         let xhr = new XMLHttpRequest();
@@ -64,9 +61,7 @@ class Ajax {
                         else
                             obj.success(this.responseText);
                     }break;
-                    case 401: alert('Sessão expirada');
-                    case 422:
-                    case 500: if(typeof obj.error === 'function') {
+                    default: if(typeof obj.error === 'function') {
                         obj.error(JSON.parse(this.responseText), this.status);
                     }break;
                 }
@@ -84,11 +79,11 @@ class Ajax {
         if(typeof obj.processData !== 'undefined' && obj.processData === true)
             obj.data = this.param(obj.data);
 
-        if(obj.method === 'POST' && obj.data !== 'undefined') {
-            if(obj.token)
-                xhr.setRequestHeader('X-CSRF-Token', document.querySelector('input[name="_token"]'));
-            xhr.send(obj.data);
-        }
+        // if(obj.method === 'POST' && obj.data !== 'undefined') {
+        //     if(obj.token)
+        //         xhr.setRequestHeader('X-CSRF-Token', document.querySelector('input[name="_token"]'));
+        //     xhr.send(obj.data);
+        // }
         else
             xhr.send();
     }
