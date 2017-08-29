@@ -2,8 +2,8 @@
 Tabela is a simple table with ajax pagination with pure javascript. No jQuery required or any other dependencies. Just import into your project and have fun =)
 
 ## Demo
-- [Simple table](https://philipebarra.github.io/tabela/examples/example1/)
-- [Ajax](https://philipebarra.github.io/tabela/examples/example2/)
+- [Simple table](https://philipebarra.github.io/tabela/examples/example1/index.html)
+- [Ajax](https://philipebarra.github.io/tabela/examples/example2/index.html)
  
 ## Usage
 
