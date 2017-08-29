@@ -2,6 +2,10 @@ class Tabela
 {
     constructor(o)
     {
+        this._previousString = 'Anterior';
+        this._nextString = 'Próximo';
+        this._defaultContent = 'Nenhum Registro para exibir';
+
         this._tabela = document.getElementById(o.id);
         this._tbody = this._tabela.querySelector('body');
         this._multiSelect = o.multiSelect ? true : false;
@@ -12,9 +16,6 @@ class Tabela
         this._isSelected = false;
         this._paginate = o.paginate === 'undefined' ? true : o.paginate;
         this._page = 1;
-
-        this._previousString = 'Anterior';
-        this._nextString = 'Próximo';
         this._config();
     }
 
@@ -130,7 +131,7 @@ class Tabela
     {
         let body = this._tabela.querySelector('tbody');
         if(typeof e === 'undefined' || e.length === 0)
-            body.innerHTML = `<tr data-empty="true"><td colspan="${this._columns.length}" style="text-align:center">Nenhum registro para exibir</td></tr>`;
+            body.innerHTML = `<tr data-empty="true"><td colspan="${this._columns.length}" style="text-align:center">${this._defaultContent}</td></tr>`;
         else {
             let lines = '';
             for (let i = 0; i < e.data.length; i++) {//percorrendo as colunas existentes
