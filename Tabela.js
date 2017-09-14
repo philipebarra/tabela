@@ -208,7 +208,7 @@ class Tabela
         }
         a.push({c:p.isLastPage() ? 'disabled' : '', v:this._nextString});
         this._page = p.page;
-        this._createPaginationButtons(a);
+        this._createPaginationButtons(a, e.total);
     }
 
     //retorna um objeto da linha selecionada {nome_coluna:valor, nome_coluna:valor}
@@ -255,10 +255,10 @@ class Tabela
         return false;
     }
 
-    _createPaginationButtons(o)
+    _createPaginationButtons(o, e)
     {
         let pagination = `${o.map( n => `<li ${typeof n.c == 'undefined' ? null : `class="${n.c}"`}><a ${n.c !== 'disabled' ? `href="${this._url}?page=${n.v}` : null}"}>${n.v}</a></li>`).join('')}`;
-        pagination = `<nav class="pull-right" id="pagination" aria-label="Page navigation"><ul class="pagination">${pagination}</ul></nav>`;
+        pagination = `<nav id="pagination" aria-label="Page navigation">${e} resultado(s)<ul class="pagination pull-right">${pagination}</ul></nav>`;
     //     <nav aria-label="Page navigation">
     //     <ul class="pagination">
     //       <li>
