@@ -4,7 +4,7 @@ class Tabela
     {
         this._previousString = 'Anterior';
         this._nextString = 'Próximo';
-        this._defaultContent = 'Nenhum Registro para exibir';
+        this._defaultContent = 'Nenhum registro para exibir';
 
         this._tabela = document.getElementById(o.id);
         this._tbody = this._tabela.querySelector('body');
@@ -30,7 +30,7 @@ class Tabela
             let i = a.length;
             this._columns = [];
             while (i--) {
-               this._columns[i] = a[i].textContent.toLowerCase().replace(/[^a-z0-9_]/ig, "_");
+                this._columns[i] = a[i].textContent.toLowerCase().replace(/[^a-z0-9_]/ig, "_");
             }
         }
 
@@ -41,6 +41,14 @@ class Tabela
             if(!this._tbody)
                 this.setData();
         }
+    }
+
+    /**
+     * Apenas um apelido para o método ajaxLoad()
+     */
+    update()
+    {
+        this.ajaxLoad();
     }
 
     //ajax que modifica os valores da tabela
@@ -129,20 +137,37 @@ class Tabela
     //se estiver vazio coloca a mensagem padrão centralizada na tabela
     setData(e)
     {
-        let body = this._tabela.querySelector('tbody');
-        if(typeof e === 'undefined' || e.length === 0)
-            body.innerHTML = `<tr data-empty="true"><td colspan="${this._columns.length}" style="text-align:center">${this._defaultContent}</td></tr>`;
+
+        if(typeof e === 'undefined' || e.length === 0) {
+            this.setDefaultContent();
+        }
         else {
-            let lines = '';
-            for (let i = 0; i < e.data.length; i++) {//percorrendo as colunas existentes
-                lines += this.setLine(e.data[i]);
+
+            let body = this._tabela.querySelector('tbody');
+
+            if(e.total === 0) {//0 resultados no ajax
+
+                this.setDefaultContent();
+            } else {
+
+                let lines = '';
+                for (let i = 0; i < e.data.length; i++) {//percorrendo as colunas existentes
+                    lines += this.setLine(e.data[i]);
+                }
+                body.innerHTML = lines;
             }
-            body.innerHTML = lines;
+
         }
 
         if(this._paginate) {
             this.showPagination(e);
         }
+    }
+
+    setDefaultContent()
+    {
+        let body = this._tabela.querySelector('tbody');
+        body.innerHTML = `<tr data-empty="true"><td colspan="${this._columns.length}" style="text-align:center">${this._defaultContent}</td></tr>`;
     }
 
     //cria a string html de uma única linha com os dados passados como argumento {nome_coluna:valor}
@@ -157,19 +182,19 @@ class Tabela
 
     showPagination(e)
     {
-       /*
-        * verificar se página atual é 1 (desabilitar anterior)
-        * verificar se página atual é a última (desabilitar próximo)
-        * verificar se depois da página atual há +4 páginas (5,6...x)
-        * verificar se antes da página atual há -4 páginas (x...4,5)
-        */
+        /*
+         * verificar se página atual é 1 (desabilitar anterior)
+         * verificar se página atual é a última (desabilitar próximo)
+         * verificar se depois da página atual há +4 páginas (5,6...x)
+         * verificar se antes da página atual há -4 páginas (x...4,5)
+         */
 
         let p = new Pagination(e.page, e.total, e.length);
         let a = [];
         a.push({c:p.isFirst() ? 'disabled' : '', v:this._previousString});
-        
+
         if(p.page < 5) {//se estiver nas primeiras 4 páginas
-            
+
             for(let i = 1; i <= p.endOfBeginning(); i++) {
                 if(p.page == i)
                     a.push({c:'active', v:i});
@@ -184,7 +209,7 @@ class Tabela
             }
         }
         else if(p.hasNext() && (p.totalPages - p.next()) >= 4) {//a página atual possui mais 4 registros adiante
-            
+
             a.push({v:1});
             a.push({c:'disabled', v:'...'});
             a.push({v:p.previous()});
@@ -193,12 +218,12 @@ class Tabela
             a.push({c:'disabled', v:'...'});
             a.push({v:p.lastPage()});
         } else {//a página atual está entre as 5 últimas
-            
+
             if(p.lastPage() > 5) {//se houver apenas 5 páginas não precisa colocar ...
                 a.push({v:1});
                 a.push({c:'disabled', v:'...'});
             }
-            
+
             for(let i = p.beginOfTheEnd(); i <= p.lastPage(); i++) {
                 if(p.page === i)
                     a.push({c:'active', v:i});
@@ -208,7 +233,7 @@ class Tabela
         }
         a.push({c:p.isLastPage() ? 'disabled' : '', v:this._nextString});
         this._page = p.page;
-        this._createPaginationButtons(a);
+        this._createPaginationButtons(a, e.total);
     }
 
     //retorna um objeto da linha selecionada {nome_coluna:valor, nome_coluna:valor}
@@ -248,36 +273,36 @@ class Tabela
     {
         let i = a.length;
         while (i--) {
-           if (a[i] === obj) {
-               return true;
-           }
+            if (a[i] === obj) {
+                return true;
+            }
         }
         return false;
     }
 
-    _createPaginationButtons(o)
+    _createPaginationButtons(o, e)
     {
         let pagination = `${o.map( n => `<li ${typeof n.c == 'undefined' ? null : `class="${n.c}"`}><a ${n.c !== 'disabled' ? `href="${this._url}?page=${n.v}` : null}"}>${n.v}</a></li>`).join('')}`;
-        pagination = `<nav class="pull-right" id="pagination" aria-label="Page navigation"><ul class="pagination">${pagination}</ul></nav>`;
-    //     <nav aria-label="Page navigation">
-    //     <ul class="pagination">
-    //       <li>
-    //         <a href="#" aria-label="Previous">
-    //           <span aria-hidden="true">&laquo;</span>
-    //         </a>
-    //       </li>
-    //       <li><a href="#">1</a></li>
-    //       <li><a href="#">2</a></li>
-    //       <li><a href="#">3</a></li>
-    //       <li><a href="#">4</a></li>
-    //       <li><a href="#">5</a></li>
-    //       <li>
-    //         <a href="#" aria-label="Next">
-    //           <span aria-hidden="true">&raquo;</span>
-    //         </a>
-    //       </li>
-    //     </ul>
-    //   </nav>
+        pagination = `<nav id="pagination" aria-label="Page navigation">${e} resultado(s)<ul class="pagination pull-right">${pagination}</ul></nav>`;
+        //     <nav aria-label="Page navigation">
+        //     <ul class="pagination">
+        //       <li>
+        //         <a href="#" aria-label="Previous">
+        //           <span aria-hidden="true">&laquo;</span>
+        //         </a>
+        //       </li>
+        //       <li><a href="#">1</a></li>
+        //       <li><a href="#">2</a></li>
+        //       <li><a href="#">3</a></li>
+        //       <li><a href="#">4</a></li>
+        //       <li><a href="#">5</a></li>
+        //       <li>
+        //         <a href="#" aria-label="Next">
+        //           <span aria-hidden="true">&raquo;</span>
+        //         </a>
+        //       </li>
+        //     </ul>
+        //   </nav>
 
         let nav = document.getElementById('pagination');
         if(nav)
@@ -291,7 +316,7 @@ class Tabela
                 return Reflect.apply(this._updateTable, this, [links[i]]);//modificando this para esta classe
             }
         }
-        
+
     }
 
     _updateTable(e)
@@ -301,13 +326,13 @@ class Tabela
                 --this._page;
             else if(e.textContent == this._nextString)
                 ++this._page;
-                
+
             else
                 this._page = e.textContent;
 
             this.ajaxLoad();
         }
-        
+
         return false;
     }
 }
@@ -319,7 +344,7 @@ class Pagination
         this._page = parseInt(page);
         this._total = parseInt(total);
         this._length = parseInt(length);
-        this._totalPages = Math.ceil(total/length);        
+        this._totalPages = Math.ceil(total/length);
     }
 
     previous()
@@ -371,7 +396,7 @@ class Pagination
     {
         return this._page;
     }
-    
+
     get totalPages()
     {
         return this._totalPages;
